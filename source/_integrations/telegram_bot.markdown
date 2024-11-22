@@ -19,6 +19,8 @@ If you don't need to receive messages, you can use the [broadcast](/integrations
 
 Available actions: `send_message`, `send_photo`, `send_video`, `send_animation`, `send_voice`, `send_sticker`, `send_document`, `send_location`, `edit_message`, `edit_caption`, `edit_replymarkup`, `answer_callback_query`, `delete_message` and `leave_chat`.
 
+Actions that send contents (`send_*`) will return a list of `message_id`/`chat_id` for messages delievered. This will populate [Response Data](/docs/scripts/perform-actions#use-templates-to-handle-response-data) that you can further utilize in your automations to edit/delete the message later based on the `message_id`.
+
 ### Action `telegram_bot.send_message`
 
 Send a notification.
@@ -604,4 +606,29 @@ actions:
     data:
       parse_mode: html
       disable_web_page_preview: true
+```
+
+## Example: automation to send a message and delete after a delay
+
+```yaml
+alias: telegram send message and delete
+sequence:
+  - action: telegram_bot.send_message
+    metadata: {}
+    data:
+      message: testing
+    response_variable: response
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - repeat:
+      for_each: "{{ response.chats }}"
+      sequence:
+        - action: telegram_bot.delete_message
+          metadata: {}
+          data:
+            message_id: "{{ repeat.item.message_id }}"
+            chat_id: "{{ repeat.item.chat_id }}"
 ```

@@ -610,25 +610,24 @@ actions:
 
 ## Example: automation to send a message and delete after a delay
 
+{% raw %}
+
 ```yaml
 alias: telegram send message and delete
 sequence:
   - action: telegram_bot.send_message
-    metadata: {}
     data:
       message: testing
     response_variable: response
   - delay:
-      hours: 0
-      minutes: 0
       seconds: 5
-      milliseconds: 0
   - repeat:
-      for_each: "{{ response.chats }}"
       sequence:
         - action: telegram_bot.delete_message
-          metadata: {}
           data:
             message_id: "{{ repeat.item.message_id }}"
             chat_id: "{{ repeat.item.chat_id }}"
+      for_each: "{{ response.chats }}"
 ```
+
+{% endraw %}
